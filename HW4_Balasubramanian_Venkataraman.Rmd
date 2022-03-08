@@ -1,0 +1,74 @@
+---
+title: "IPL Cricket Data"
+author: "Venkataraman Balasubramanian"
+date: "3/8/2022"
+output: html_document
+
+knit: (function(input_file, encoding) {
+  out_dir <- 'docs';
+  rmarkdown::render(input_file,
+ encoding=encoding,
+ output_file=file.path(dirname(input_file), out_dir, 'index.html'))})
+ 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+Indian Premier League is a cricket league played in India in which cricketers from all around the world. It can be considered as the NFL of cricket. The league started in 2008 comprising of 8 teams playing each other twice. The top 4 teams qualify for the the next stage and play the semi finals & then eventually finals. This league is not only one of the top revenue grosser but is watched eaglerly by all cricket fans.
+
+I pulled this dataset from publicly available site (i wrote a python program to pull it) and has been curated in such a fashion that each row of this dataset represent a game. It contain the information such as (not restricted to) -  
+
+ - Home and Away team  
+ - Venue  
+ - Date of the game  
+ - Player Of the Game  
+ - Winner    
+ 
+The purpose of this exercise is not only to expose my fellow cohort to the game of cricket, the IPL and also give them an opportunity to browse through the specifics
+ 
+I will explore the table options using two packages -  
+
+ - kableExtra  
+ - DT  
+
+## Load the required packages
+```{r message=FALSE, warning=FALSE}
+library(dplyr)
+library(kableExtra)
+library(DT)
+```
+
+## Load the data
+We will load the entire dataset and will filter out columns to just restrict our table to select few aspects of the game
+```{r}
+#This is a pipe delimited file
+data = read.csv(file = "IPL_Game_Metadata.txt",sep = "|")
+
+#Select a subset of columns
+tbl_data = data %>% select(GameDate, City, HomeTeam,AwayTeam, TossWinner, TossDecision, Winner, PlayerOfMatch)
+
+#Rename columns
+colnames(tbl_data) = c("Date", "Venue", "Home Team", "Away Team", "Toss Won By", "Toss Decision", "Winner", "Player of the Game")
+```
+
+## Table using kableExtra package  
+
+I like the kableExtra package because it lets you group the headers in addition to other styling options
+```{r}
+
+kbl_tbl_data = tbl_data %>% kbl(col.names = c("Date", "Venue", "Home", "Away", "Won By", "Decision", "Winner", "Player of the Game" )) %>% add_header_above(c(" ", " ", "Teams"=2, "Toss"=2, " "," " ))
+
+kbl_tbl_data %>% kable_styling(bootstrap_options = "hover") %>% scroll_box(width = "100%", height = "700px")
+```
+
+## Table using DT package
+
+DT package (especially datatable function) packs in lot of features. It lets you search for values in addition to variable count display options & sorting
+
+```{r}
+tbl_data %>% datatable()
+```
+
